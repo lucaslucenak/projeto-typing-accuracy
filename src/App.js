@@ -31,11 +31,31 @@ const Word = ({word, validKeys}) => {
 const App = () => {
     const [typedKeys, setTypedKeys] = useState([]);
     const [validKeys, setValidKeys] = useState([]);
+    const [completedWords, setCompletedWords] = useState([]);
     const [word, setWord] = useState('');
 
     useEffect(() => {
         setWord(getWord());
     }, [])
+
+    useEffect(() => {
+        const wordFromValidKeys = validKeys.join('').toLowerCase();
+        if (word && word == wordFromValidKeys) {
+            //adiciona a palavra às palavras completas
+            //limpa o array validKeys
+            //busca uma palavra nova
+
+            let newWord = null
+            
+            do {
+                newWord = getWord();
+            } while(completedWords.includes(newWord));
+
+            setWord(newWord);
+            setValidKeys([]);
+            setCompletedWords((prev) => [...prev, word]);
+        }
+    }, [word, validKeys, completedWords])
 
     console.log('word', getWord());
 
@@ -51,11 +71,7 @@ const App = () => {
                 const isNextChar = isValidLength && word[prev.length] == key;
                 return (isNextChar) ? [...prev, key] : prev;
             })
-
         }
-
-        console.log('key', key);
-
     }
 
     return (
@@ -66,9 +82,8 @@ const App = () => {
         <div className="typed-keys">{typedKeys ? typedKeys.join(' ') : null}</div>
         <div className="completed-words">
             <ol>
-                <li>arroz</li>
-                <li>feijão</li>
-                <li>batata</li>
+                {completedWords.map((word) => (<li key={word}>{word} </li>
+                ))}
             </ol>
         </div>
     </div>
